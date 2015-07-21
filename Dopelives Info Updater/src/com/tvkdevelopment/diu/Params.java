@@ -5,7 +5,7 @@ package com.tvkdevelopment.diu;
  */
 public class Params {
 
-    /** The amount of time in milliseconds before between each topic request */
+    /** The amount of time in milliseconds between each topic request */
     public static final int REQUEST_INTERVAL_TOPIC = 5 * 1000;
     /** The string to put behind the streamer/game info in the status */
     public static final String STATUS_POSTFIX = "Join us in our main chat: http://dopelives.com";
