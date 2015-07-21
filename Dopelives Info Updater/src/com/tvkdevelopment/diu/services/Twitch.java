@@ -26,7 +26,7 @@ public class Twitch {
             Pattern.compile("[-+~:].*") };
     /** A filter for converting multiple spaces to one */
     private static final Pattern sDoubleSpaceFilter = Pattern.compile(" {2,}");
-    /** A filter for remove the last word */
+    /** A filter for removing the last word */
     private static final Pattern sWordCutFilter = Pattern.compile(" [^ ]+$");
 
     /**

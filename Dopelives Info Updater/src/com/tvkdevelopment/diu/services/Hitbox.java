@@ -39,7 +39,7 @@ public class Hitbox {
     }
 
     /**
-     * Cleans up a query. Useful to perform after each filter.
+     * Cleans up a query for communication with Hitbox.
      *
      * @param query
      *            The query to clean
@@ -67,6 +67,7 @@ public class Hitbox {
         // Retrieve the media data
         final String mediaData = HttpHelper.get(url);
         if (mediaData == null) {
+            System.out.println("Couldn't update Hitbox");
             return;
         }
         final JSONObject json = new JSONObject(mediaData);

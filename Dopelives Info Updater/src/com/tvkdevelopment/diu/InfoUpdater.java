@@ -30,8 +30,9 @@ public class InfoUpdater implements StreamInfoListener {
             return;
         }
 
-        System.out.println("\nNew game: [" + streamer + "] " + game.trim());
-        final String status = "[" + streamer + "] " + game.trim() + " | " + Params.STATUS_POSTFIX;
+        final String statusInfo = "[" + streamer + "] " + game.trim();
+        System.out.println("\nNew game: " + statusInfo);
+        final String status = statusInfo + " | " + Params.STATUS_POSTFIX;
 
         // Search game on Twitch and update it
         final String gameTwitch = Twitch.searchGame(game);

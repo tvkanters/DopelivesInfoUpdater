@@ -77,9 +77,9 @@ public class HttpHelper {
      *
      *
      * @param url
-     *            The URL to POST to
+     *            The URL to PUT or POST to
      * @param parameters
-     *            The parameters to POST
+     *            The parameters to PUT or POST
      * @param requestMethod
      *            The HTTP request method, such as PUT or POST
      *
@@ -135,7 +135,7 @@ public class HttpHelper {
      */
     public static String encode(final String value) {
         try {
-            return URLEncoder.encode(value, "UTF-8");
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
         } catch (final UnsupportedEncodingException ex) {
             // Won't ever happen
             throw new RuntimeException(ex);

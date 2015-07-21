@@ -35,8 +35,8 @@ public class StreamInfo {
     /** The listeners that will receive updates of stream info changes */
     private static final List<StreamInfoListener> sListeners = new LinkedList<>();
 
-    /** The last printed topic info */
-    private static String sLastPrintInfo = "";
+    /** The last printed topic info length, used for clearing */
+    private static int sLastPrintInfoLength = 0;
 
     /**
      * Periodically refreshes the latest stream info. This method is synchronous and will deny any calls after it.
@@ -52,11 +52,11 @@ public class StreamInfo {
                     final String printInfo = sTimeFormatter.format(Calendar.getInstance().getTime())
                             + result.replace("\n", " ");
                     System.out.print(printInfo);
-                    for (int i = printInfo.length(); i < sLastPrintInfo.length(); ++i) {
+                    for (int i = printInfo.length(); i < sLastPrintInfoLength; ++i) {
                         System.out.print(" ");
                     }
                     System.out.print("\r");
-                    sLastPrintInfo = printInfo;
+                    sLastPrintInfoLength = printInfo.length();
 
                     // Parse the topic
                     final Matcher matcher = sTopicParser.matcher(result.trim());
@@ -83,6 +83,7 @@ public class StreamInfo {
                         if (sStreamActive) {
                             sStreamActive = false;
 
+                            // Notify all listeners of a change in stream info
                             for (final StreamInfoListener listener : sListeners) {
                                 listener.onStreamInfoRemoved();
                             }
@@ -93,6 +94,7 @@ public class StreamInfo {
                 }
 
             } catch (final Throwable ex) {
+                // Catch EVERYTHING to try to keep running
                 System.out.println("\nTopic updater exception/error");
                 ex.printStackTrace();
             }
@@ -102,6 +104,7 @@ public class StreamInfo {
                 Thread.sleep(Params.REQUEST_INTERVAL_TOPIC);
 
             } catch (final Throwable ex) {
+                // Catch EVERYTHING to try to keep running
                 System.out.println("\nThread sleep exception/error");
                 ex.printStackTrace();
             }
