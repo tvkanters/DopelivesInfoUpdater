@@ -14,6 +14,7 @@ public class InfoUpdater implements StreamInfoListener {
 
     public static void main(final String[] args) {
         System.out.println("Start scanning for topic changes");
+        System.setProperty("http.keepAlive", "false");
         StreamInfo.addListener(new InfoUpdater());
         StreamInfo.startRequestInterval();
     }

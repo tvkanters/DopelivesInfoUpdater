@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -16,6 +17,9 @@ import java.nio.charset.StandardCharsets;
  * A helper class for HTTP requests.
  */
 public class HttpHelper {
+
+    /** The HTTP timeout in milliseconds */
+    private static int HTTP_TIMEOUT = 5000;
 
     /**
      * Retrieves the content from a URL.
@@ -29,6 +33,9 @@ public class HttpHelper {
         final StringBuilder result = new StringBuilder();
         try {
             final URLConnection connection = new URL(url).openConnection();
+            connection.setRequestProperty("Connection", "close");
+            connection.setConnectTimeout(HTTP_TIMEOUT);
+            connection.setReadTimeout(HTTP_TIMEOUT);
             final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),
                     Charset.forName("UTF-8")));
             String line;
@@ -36,6 +43,9 @@ public class HttpHelper {
                 result.append(line + "\n");
             }
             reader.close();
+        } catch (final SocketTimeoutException ex) {
+            System.out.println("\nTimeout while loading URL " + url + ": " + ex.getClass());
+            return null;
         } catch (final IOException ex) {
             System.out.println("\nCouldn't load URL " + url + ": " + ex.getClass());
             return null;
@@ -91,6 +101,9 @@ public class HttpHelper {
         try {
             // Create the connection
             final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestProperty("Connection", "close");
+            connection.setConnectTimeout(HTTP_TIMEOUT);
+            connection.setReadTimeout(HTTP_TIMEOUT);
             connection.setDoOutput(true);
             connection.setInstanceFollowRedirects(true);
             connection.setRequestMethod(requestMethod);
@@ -117,6 +130,9 @@ public class HttpHelper {
             }
             reader.close();
 
+        } catch (final SocketTimeoutException ex) {
+            System.out.println("Timeout while " + requestMethod + " to URL " + url + ": " + ex.getClass());
+            return null;
         } catch (final IOException ex) {
             System.out.println("Couldn't " + requestMethod + " to URL " + url + ": " + ex.getClass());
             return null;
