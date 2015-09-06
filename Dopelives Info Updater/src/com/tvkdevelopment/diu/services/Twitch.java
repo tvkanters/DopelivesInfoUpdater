@@ -131,7 +131,16 @@ public class Twitch {
      * @param game
      *            The new game in a full name format
      */
-    public static void updateInfo(final String status, final String game) {
+    public static void updateInfo(final String status, String game) {
+        // Prevent Twitch from banning us for certain games
+        for (final String bannedGame : Params.TWITCH_BLACKLIST) {
+            if (game.equals(bannedGame)) {
+                game = Params.TWITCH_BLACKLIST_REPLACEMENT;
+                break;
+            }
+        }
+
+        // Construct the URL
         final String data = "channel[status]=" + HttpHelper.encode(status) + "&channel[game]="
                 + HttpHelper.encode(game);
 
