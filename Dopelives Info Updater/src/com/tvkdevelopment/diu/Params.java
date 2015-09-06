@@ -22,4 +22,11 @@ public class Params {
     /** The default Hitbox game category ID to fall back to when the game isn't found */
     public static final String HITBOX_DEFAULT_GAME = "50077";
 
+    /** The games that Twitch will ban us for */
+    public static final String[] TWITCH_BLACKLIST = { "Battle Rape", "BMX XXX", "Cobra Club", "Criminal Girls",
+            "Dramatical Murder", "Grezzo", "Grezzo 2", "HuniePop", "RapeLay", "Sakura Spirit", "Sakura Fantasy",
+            "Second Life", "The Guy Game", "Hatred", "Fahrenheit: Indigo Prophecy - Director's Cut", "Manhunt 2: Uncut" };
+    /** The replacement game to send to Twitch if we're playing a banned game */
+    public static final String TWITCH_BLACKLIST_REPLACEMENT = "Super Secret Game";
+
 }
