@@ -20,6 +20,12 @@ public class Twitch {
     private static final String UPDATE_URL = "https://api.twitch.tv/kraken/channels/" + Params.TWITCH_CHANNEL
             + "?oauth_token=" + Params.TWITCH_TOKEN;
 
+    /** The Accept header to target the right API with */
+    private static final String ACCEPT_HEADER = "application/vnd.twitchtv.v3+json";
+
+    /** The HTTP helper to use for requests */
+    private static final HttpHelper sHttpHelper = new HttpHelper(ACCEPT_HEADER);
+
     /** The filters for things that should be removed step-by-step from the query */
     private static final Pattern[] sQueryFilters = { Pattern.compile("http[^ )]+"), Pattern.compile("\\([^)]*\\)"),
             Pattern.compile("filler", Pattern.CASE_INSENSITIVE), Pattern.compile(" [-+~](?: .*|$)"),
@@ -99,8 +105,8 @@ public class Twitch {
      */
     private static String executeGameSearch(final String query) {
         System.out.println("Twitch search: " + query);
-        final String result = HttpHelper.get("https://api.twitch.tv/kraken/search/games?q=" + HttpHelper.encode(query)
-                + "&type=suggest");
+        final String result = sHttpHelper.get("https://api.twitch.tv/kraken/search/games?q=" + HttpHelper.encode(query)
+                + "&type=suggest&oauth_token=" + Params.TWITCH_TOKEN);
         if (result == null) {
             return null;
         }
@@ -148,7 +154,7 @@ public class Twitch {
         int tryCount = 0;
         while (tryCount++ < MAX_UPDATE_ATTEMPT) {
             // Send data
-            final String result = HttpHelper.put(UPDATE_URL, data);
+            final String result = sHttpHelper.put(UPDATE_URL, data);
 
             // Check if the update was successful
             if (result != null) {
@@ -181,7 +187,7 @@ public class Twitch {
      */
     public static String requestToken(final String clientID, final String clientSecret, final String redirectUri,
             final String code, final String state) {
-        return HttpHelper.post("https://api.twitch.tv/kraken/oauth2/token", "client_id=" + clientID + "&client_secret="
+        return sHttpHelper.post("https://api.twitch.tv/kraken/oauth2/token", "client_id=" + clientID + "&client_secret="
                 + clientSecret + "&grant_type=authorization_code&redirect_uri=" + HttpHelper.encode(redirectUri)
                 + "&code=" + code + "&state=" + state);
     }

@@ -12,6 +12,9 @@ import com.tvkdevelopment.diu.util.HttpHelper;
  */
 public class Hitbox {
 
+    /** The HTTP helper to use for requests */
+    private static final HttpHelper sHttpHelper = new HttpHelper();
+
     /** A filter used for replacing spaces with dashes */
     private static final Pattern sSpaceFilter = Pattern.compile(" ");
     /** A filter used for removing invalid characters */
@@ -26,7 +29,7 @@ public class Hitbox {
      * @return The category ID of the game according to Hitbox or a default ID if it wasn't found
      */
     public static String searchGame(final String query) {
-        final String result = HttpHelper.get("http://api.hitbox.tv/game/" + HttpHelper.encode(cleanupQuery(query))
+        final String result = sHttpHelper.get("http://api.hitbox.tv/game/" + HttpHelper.encode(cleanupQuery(query))
                 + "?seo=true");
         if (result != null) {
             final JSONObject game = new JSONObject(result).optJSONObject("category");
@@ -65,7 +68,7 @@ public class Hitbox {
                 + "&filter=recent&hiddenOnly=false&limit=1&nocache=true&publicOnly=false&yt=false";
 
         // Retrieve the media data
-        final String mediaData = HttpHelper.get(url);
+        final String mediaData = sHttpHelper.get(url);
         if (mediaData == null) {
             System.out.println("Couldn't update Hitbox");
             return;
@@ -78,7 +81,7 @@ public class Hitbox {
         livestreamInfo.put("media_category_id", game);
 
         // Send the update media data
-        HttpHelper.put(url, json.toString());
+        sHttpHelper.put(url, json.toString());
         System.out.println("Hitbox updated");
     }
 
@@ -93,7 +96,7 @@ public class Hitbox {
      * @return The authentication token
      */
     public static String requestToken(final String login, final String password) {
-        return HttpHelper.post("http://api.hitbox.tv/auth/token", "login=" + login + "&pass=" + password);
+        return sHttpHelper.post("http://api.hitbox.tv/auth/token", "login=" + login + "&pass=" + password);
     }
 
 }

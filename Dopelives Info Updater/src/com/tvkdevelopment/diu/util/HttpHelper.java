@@ -1,5 +1,8 @@
 package com.tvkdevelopment.diu.util;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +25,55 @@ public class HttpHelper {
     private static int HTTP_TIMEOUT = 5000;
 
     /**
+     * Encodes a parameter value.
+     *
+     * @param value
+     *            The value to encode
+     *
+     * @return The encoded value
+     */
+    public static String encode(final String value) {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
+        } catch (final UnsupportedEncodingException ex) {
+            // Won't ever happen
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Nullable
+    private String mAcceptHeader;
+
+    /**
+     * Creates a new HTTP helper for connections that don't need an accept header.
+     */
+    public HttpHelper() {
+    }
+
+    /**
+     * Creates a new HTTP helper for connections that require an accept header.
+     *
+     * @param acceptHeader The accept header to use in each request
+     */
+    public HttpHelper(@NotNull final String acceptHeader) {
+        mAcceptHeader = acceptHeader;
+    }
+
+    /**
+     * Sets default headers and other properties on the connection.
+     *
+     * @param connection The connection to update initialise
+     */
+    private void injectStandardProperties(final URLConnection connection) {
+        connection.setRequestProperty("Connection", "close");
+        if (mAcceptHeader != null) {
+            connection.setRequestProperty("Accept", mAcceptHeader);
+        }
+        connection.setConnectTimeout(HTTP_TIMEOUT);
+        connection.setReadTimeout(HTTP_TIMEOUT);
+    }
+
+    /**
      * Retrieves the content from a URL.
      *
      * @param url
@@ -29,18 +81,15 @@ public class HttpHelper {
      *
      * @return The contents or null if the URL couldn't be read
      */
-    public static String get(final String url) {
+    public String get(final String url) {
         final StringBuilder result = new StringBuilder();
         try {
             final URLConnection connection = new URL(url).openConnection();
-            connection.setRequestProperty("Connection", "close");
-            connection.setConnectTimeout(HTTP_TIMEOUT);
-            connection.setReadTimeout(HTTP_TIMEOUT);
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),
-                    Charset.forName("UTF-8")));
+            injectStandardProperties(connection);
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
             String line;
             while ((line = reader.readLine()) != null) {
-                result.append(line + "\n");
+                result.append(line).append("\n");
             }
             reader.close();
         } catch (final SocketTimeoutException ex) {
@@ -64,7 +113,7 @@ public class HttpHelper {
      *
      * @return The result or null if the URL couldn't be read
      */
-    public static String put(final String url, final String parameters) {
+    public String put(final String url, final String parameters) {
         return update(url, parameters, "PUT");
     }
 
@@ -78,7 +127,7 @@ public class HttpHelper {
      *
      * @return The result or null if the URL couldn't be read
      */
-    public static String post(final String url, final String parameters) {
+    public String post(final String url, final String parameters) {
         return update(url, parameters, "POST");
     }
 
@@ -95,15 +144,13 @@ public class HttpHelper {
      *
      * @return The result or null if the URL couldn't be read
      */
-    private static String update(final String url, final String parameters, final String requestMethod) {
+    private String update(final String url, final String parameters, final String requestMethod) {
         final StringBuilder result = new StringBuilder();
 
         try {
             // Create the connection
             final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestProperty("Connection", "close");
-            connection.setConnectTimeout(HTTP_TIMEOUT);
-            connection.setReadTimeout(HTTP_TIMEOUT);
+            injectStandardProperties(connection);
             connection.setDoOutput(true);
             connection.setInstanceFollowRedirects(true);
             connection.setRequestMethod(requestMethod);
@@ -141,20 +188,4 @@ public class HttpHelper {
         return result.toString();
     }
 
-    /**
-     * Encodes a parameter value.
-     *
-     * @param value
-     *            The value to encode
-     *
-     * @return The encoded value
-     */
-    public static String encode(final String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
-        } catch (final UnsupportedEncodingException ex) {
-            // Won't ever happen
-            throw new RuntimeException(ex);
-        }
-    }
 }

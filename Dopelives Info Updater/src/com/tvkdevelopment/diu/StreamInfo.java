@@ -20,6 +20,9 @@ public class StreamInfo {
     /** The URL at which to get the topic info */
     private static final String URL_TOPIC = "http://goalitium.kapsi.fi/dopelives_status2";
 
+    /** The HTTP helper to use for requests */
+    private static final HttpHelper sHttpHelper = new HttpHelper();
+
     /** The pattern used to match active streams */
     private static final Pattern sTopicParser = Pattern.compile("^(.+)\n([^:]+): ?(.+)$");
 
@@ -45,7 +48,7 @@ public class StreamInfo {
         while (true) {
             try {
                 // Check the newest stream info
-                final String result = HttpHelper.get(URL_TOPIC);
+                final String result = sHttpHelper.get(URL_TOPIC);
 
                 if (result != null) {
                     // Overwrite the last print info by new info
